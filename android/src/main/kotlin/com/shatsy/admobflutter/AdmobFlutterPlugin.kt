@@ -27,19 +27,19 @@ fun createAdListener(channel: MethodChannel) : AdListener {
 class AdmobFlutterPlugin(private val registrar: Registrar): MethodCallHandler {
   companion object {
     @JvmStatic
-    fun registerWith(registrar: Registrar) {
-      val defaultChannel = MethodChannel(registrar.messenger(), "admob_flutter")
-      defaultChannel.setMethodCallHandler(AdmobFlutterPlugin(registrar))
+    fun registerWith(reg: Registrar) {
+      val defaultChannel = MethodChannel(reg.messenger(), "admob_flutter")
+      defaultChannel.setMethodCallHandler(AdmobFlutterPlugin(reg))
 
-      val interstitialChannel = MethodChannel(registrar.messenger(), "admob_flutter/interstitial")
-      interstitialChannel.setMethodCallHandler(AdmobInterstitial(registrar))
+      val interstitialChannel = MethodChannel(reg.messenger(), "admob_flutter/interstitial")
+      interstitialChannel.setMethodCallHandler(AdmobInterstitial(reg))
 
-      val rewardChannel = MethodChannel(registrar.messenger(), "admob_flutter/reward")
-      rewardChannel.setMethodCallHandler(AdmobReward(registrar))
+      val rewardChannel = MethodChannel(reg.messenger(), "admob_flutter/reward")
+      rewardChannel.setMethodCallHandler(AdmobReward(reg))
 
-      registrar
+      reg
         .platformViewRegistry()
-        .registerViewFactory("admob_flutter/banner", AdmobBannerFactory(registrar.messenger()))
+        .registerViewFactory("admob_flutter/banner", AdmobBannerFactory(reg.messenger()))
     }
   }
 
