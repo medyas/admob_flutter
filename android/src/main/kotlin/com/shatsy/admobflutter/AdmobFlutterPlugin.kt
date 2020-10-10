@@ -24,12 +24,12 @@ fun createAdListener(channel: MethodChannel) : AdListener {
   }
 }
 
-class AdmobFlutterPlugin(private val context: Context): MethodCallHandler {
+class AdmobFlutterPlugin(private val registrar: Registrar): MethodCallHandler {
   companion object {
     @JvmStatic
     fun registerWith(registrar: Registrar) {
       val defaultChannel = MethodChannel(registrar.messenger(), "admob_flutter")
-      defaultChannel.setMethodCallHandler(AdmobFlutterPlugin(registrar.context()))
+      defaultChannel.setMethodCallHandler(AdmobFlutterPlugin(registrar))
 
       val interstitialChannel = MethodChannel(registrar.messenger(), "admob_flutter/interstitial")
       interstitialChannel.setMethodCallHandler(AdmobInterstitial(registrar))
@@ -46,7 +46,7 @@ class AdmobFlutterPlugin(private val context: Context): MethodCallHandler {
   override fun onMethodCall(call: MethodCall, result: Result) {
     when(call.method) {
       "initialize" -> {
-        MobileAds.initialize(context)
+        MobileAds.initialize(registrar.context())
         @Suppress("UNCHECKED_CAST")
         (call.arguments as? ArrayList<String>)?.apply {
             val configuration = RequestConfiguration.Builder().setTestDeviceIds(this).build()
@@ -59,14 +59,14 @@ class AdmobFlutterPlugin(private val context: Context): MethodCallHandler {
         val width = args["width"] as Int
         when(name) {
           "SMART_BANNER" -> {
-            val metrics = context.resources.displayMetrics
+            val metrics = registrar.context().resources.displayMetrics
             result.success(hashMapOf(
-                    "width" to AdSize.SMART_BANNER.getWidthInPixels(context) / metrics.density,
-                    "height" to AdSize.SMART_BANNER.getHeightInPixels(context) / metrics.density
+                    "width" to AdSize.SMART_BANNER.getWidthInPixels(registrar.context()) / metrics.density,
+                    "height" to AdSize.SMART_BANNER.getHeightInPixels(registrar.context()) / metrics.density
             ))
           }
           "ADAPTIVE_BANNER" -> {
-            val adSize = AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(context, width)
+            val adSize = AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(registrar.context(), width)
             result.success(hashMapOf(
               "width" to adSize.width,
               "height" to adSize.height
